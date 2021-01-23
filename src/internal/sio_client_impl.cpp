@@ -466,15 +466,7 @@ namespace sio
         {
             const object_message* obj_ptr =static_cast<object_message*>(message.get());
             const map<string,message::ptr>* values = &(obj_ptr->get_map());
-            auto it = values->find("sid");
-            if (it!= values->end()) {
-                m_sid = static_pointer_cast<string_message>(it->second)->get_string();
-            }
-            else
-            {
-                goto failed;
-            }
-            it = values->find("pingInterval");
+            auto it = values->find("pingInterval");
             if (it!= values->end()&&it->second->get_flag() == message::flag_integer) {
                 m_ping_interval = (unsigned)static_pointer_cast<int_message>(it->second)->get_int();
             }
@@ -520,6 +512,7 @@ failed:
         {
         case packet::frame_message:
         {
+            update_sid(p.get_message());
             socket::ptr so_ptr = get_socket_locked(p.get_nsp());
             if(so_ptr)so_ptr->on_message_packet(p);
             break;
@@ -537,6 +530,20 @@ failed:
 
         default:
             break;
+        }
+    }
+
+    void client_impl::update_sid(message::ptr const& message)
+    {
+        if(message && message->get_flag() == message::flag_object)
+        {
+            const object_message* obj_ptr =static_cast<object_message*>(message.get());
+            const map<string,message::ptr>* values = &(obj_ptr->get_map());
+            auto it = values->find("sid");
+            if (it!= values->end())
+            {
+                m_sid = static_pointer_cast<string_message>(it->second)->get_string();
+            }
         }
     }
 
