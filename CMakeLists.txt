@@ -33,6 +33,7 @@ add_definitions(
 
 add_library(sioclient ${ALL_SRC})
 target_include_directories(sioclient PRIVATE
+    ${boringssl_INCLUDE}
     ${CMAKE_CURRENT_LIST_DIR}/src
     ${CMAKE_CURRENT_LIST_DIR}/lib/websocketpp
     ${CMAKE_CURRENT_LIST_DIR}/lib/rapidjson/include
@@ -41,6 +42,7 @@ target_include_directories(sioclient PRIVATE
 
 set_property(TARGET sioclient PROPERTY CXX_STANDARD 11)
 set_property(TARGET sioclient PROPERTY CXX_STANDARD_REQUIRED ON)
+target_link_libraries(sioclient ${boringssl_LIBRARY})
 
 if(BUILD_SHARED_LIBS)
 set_target_properties(sioclient
@@ -50,28 +52,6 @@ set_target_properties(sioclient
 	)
 endif()
 list(APPEND TARGET_LIBRARIES sioclient)
-
-add_library(sioclient_tls ${ALL_SRC})
-target_include_directories(sioclient_tls PRIVATE
-    ${CMAKE_CURRENT_LIST_DIR}/src
-    ${CMAKE_CURRENT_LIST_DIR}/lib/websocketpp
-    ${CMAKE_CURRENT_LIST_DIR}/lib/rapidjson/include
-    ${CMAKE_CURRENT_LIST_DIR}/lib/asio/asio/include
-    ${borringssl_INCLUDE}
-)
-
-set_property(TARGET sioclient_tls PROPERTY CXX_STANDARD 11)
-set_property(TARGET sioclient_tls PROPERTY CXX_STANDARD_REQUIRED ON)
-target_link_libraries(sioclient_tls PRIVATE ${boringssl_LIBRARY} )
-target_compile_definitions(sioclient_tls PRIVATE -DSIO_TLS)
-if(BUILD_SHARED_LIBS)
-set_target_properties(sioclient_tls
-	PROPERTIES
-		SOVERSION ${MAJOR}
-		VERSION ${MAJOR}.${MINOR}.${PATCH}
-	)
-endif()
-list(APPEND TARGET_LIBRARIES sioclient_tls)
 
 include(GNUInstallDirs)
 

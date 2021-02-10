@@ -1,12 +1,14 @@
 #include "sio_socket.h"
 #include "internal/sio_packet.h"
-#include "internal/sio_client_impl.h"
+#include "internal/sio_client_base.h"
 #include <asio/steady_timer.hpp>
 #include <asio/error_code.hpp>
 #include <queue>
 #include <chrono>
 #include <cstdarg>
 #include <functional>
+#include <mutex>
+#include <iostream>
 
 #if DEBUG || _DEBUG
 #define LOG(x) std::cout << x
@@ -108,7 +110,7 @@ namespace sio
     {
     public:
 
-        impl(client_impl *,std::string const&);
+        impl(client_base *,std::string const&);
         ~impl();
 
         void on(std::string const& event_name,event_listener_aux const& func);
@@ -169,7 +171,7 @@ namespace sio
 
         static unsigned int s_global_event_id;
 
-        sio::client_impl *m_client;
+        sio::client_base *m_client;
 
         bool m_connected;
         std::string m_nsp;
@@ -228,7 +230,7 @@ namespace sio
         m_error_listener = nullptr;
     }
 
-    socket::impl::impl(client_impl *client,std::string const& nsp):
+    socket::impl::impl(client_base *client,std::string const& nsp):
         m_client(client),
         m_connected(false),
         m_nsp(nsp)
@@ -325,7 +327,7 @@ namespace sio
     void socket::impl::on_close()
     {
         NULL_GUARD(m_client);
-        sio::client_impl *client = m_client;
+        sio::client_base *client = m_client;
         m_client = NULL;
 
         if(m_connection_timer)
@@ -523,7 +525,7 @@ namespace sio
         return socket::event_listener();
     }
 
-    socket::socket(client_impl* client,std::string const& nsp):
+    socket::socket(client_base* client,std::string const& nsp):
         m_impl(new impl(client,nsp))
     {
     }

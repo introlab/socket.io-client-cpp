@@ -1,5 +1,5 @@
-#ifndef SIO_CLIENT_IMPL_H
-#define SIO_CLIENT_IMPL_H
+#ifndef SIO_CLIENT_TLS_IMPL_H
+#define SIO_CLIENT_TLS_IMPL_H
 
 #include <cstdint>
 #ifdef _WIN32
@@ -13,12 +13,14 @@
 #endif
 #include <websocketpp/client.hpp>
 #if _DEBUG || DEBUG
-#include <websocketpp/config/debug_asio_no_tls.hpp>
-typedef websocketpp::config::debug_asio client_config;
+#include <websocketpp/config/debug_asio.hpp>
+typedef websocketpp::config::debug_asio_tls client_tls_config;
 #else
-#include <websocketpp/config/asio_no_tls_client.hpp>
-typedef websocketpp::config::asio_client client_config;
+#include <websocketpp/config/asio_client.hpp>
+typedef websocketpp::config::asio_tls_client client_tls_config;
 #endif //DEBUG
+
+#include <asio/ssl/context.hpp>
 
 #include <asio/steady_timer.hpp>
 #include <asio/error_code.hpp>
@@ -36,9 +38,9 @@ namespace sio
 {
     using namespace websocketpp;
 
-    typedef websocketpp::client<client_config> client_type;
+    typedef websocketpp::client<client_tls_config> client_tls_type;
 
-    class client_impl : public client_base {
+    class client_tls_impl : public client_base {
 
     protected:
         enum con_state
@@ -49,9 +51,9 @@ namespace sio
             con_closed
         };
 
-        client_impl();
+        client_tls_impl();
 
-        ~client_impl() override;
+        ~client_tls_impl() override;
 
         //set listeners and event bindings.
 #define SYNTHESIS_SETTER(__TYPE__,__FIELD__) \
@@ -159,7 +161,7 @@ namespace sio
 
         void on_close(connection_hdl con);
 
-        void on_message(connection_hdl con, client_type::message_ptr msg);
+        void on_message(connection_hdl con, client_tls_type::message_ptr msg);
 
         //socketio callbacks
         void on_handshake(message::ptr const& message);
@@ -170,12 +172,16 @@ namespace sio
 
         void clear_timers();
 
+        typedef websocketpp::lib::shared_ptr<asio::ssl::context> context_ptr;
+
+        context_ptr on_tls_init(connection_hdl con);
+
         // Percent encode query string
         std::string encode_query_string(const std::string &query);
 
         // Connection pointer for client functions.
         connection_hdl m_con;
-        client_type m_client;
+        client_tls_type m_client;
         // Socket.IO server settings
         std::string m_sid;
         std::mutex m_sidMutex;
@@ -218,7 +224,8 @@ namespace sio
         unsigned m_reconn_made;
 
         friend class sio::client;
+        friend class sio::socket;
     };
 }
-#endif // SIO_CLIENT_IMPL_H
+#endif // SIO_CLIENT_TLS_IMPL_H
 
