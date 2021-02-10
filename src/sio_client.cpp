@@ -85,6 +85,7 @@ namespace sio
 
     void client::connect(const std::string& uri)
     {
+        close_all_connected_clients();
         m_is_tls = is_tls(uri);
         if (m_is_tls)
         {
@@ -98,6 +99,7 @@ namespace sio
 
     void client::connect(const std::string& uri, const std::map<string,string>& query)
     {
+        close_all_connected_clients();
         m_is_tls = is_tls(uri);
         if (m_is_tls)
         {
@@ -112,6 +114,7 @@ namespace sio
     void client::connect(const std::string& uri, const std::map<std::string,std::string>& query,
                          const std::map<std::string,std::string>& http_extra_headers)
     {
+        close_all_connected_clients();
         m_is_tls = is_tls(uri);
         if (m_is_tls)
         {
@@ -202,4 +205,9 @@ namespace sio
         m_impl_tls->set_reconnect_delay_max(millis);
     }
 
+    void client::close_all_connected_clients()
+    {
+        m_impl->sync_close();
+        m_impl_tls->sync_close();
+    }
 }

@@ -84,6 +84,8 @@ namespace sio
         client(client const&){}
         void operator=(client const&){}
 
+        void close_all_connected_clients();
+
         bool m_is_tls;
         client_impl* m_impl;
         client_tls_impl* m_impl_tls;
