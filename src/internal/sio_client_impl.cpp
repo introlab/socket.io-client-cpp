@@ -218,7 +218,13 @@ namespace sio
             }
             else
             {
-                ss << uo.get_resource() <<"?EIO=4&transport=websocket";
+                const string& resource = uo.get_resource();
+                ss << resource;
+                if (resource.size() == 0 || resource[resource.size() - 1] != '/')
+                {
+                    ss << "/";
+                }
+                ss<<"?EIO=4&transport=websocket";
             }
 
             if(m_sid.size()>0){
