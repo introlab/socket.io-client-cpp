@@ -79,6 +79,8 @@ namespace sio
 
         std::string const& get_sessionid() const;
 
+        void set_is_tls_verification_enabled(bool is_enabled);
+
     private:
         //disable copy constructor and assign operator.
         client(client const&){}

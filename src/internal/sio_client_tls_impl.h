@@ -26,6 +26,7 @@ typedef websocketpp::config::asio_tls_client client_tls_config;
 #include <asio/error_code.hpp>
 #include <asio/io_service.hpp>
 
+#include <atomic>
 #include <memory>
 #include <map>
 #include <thread>
@@ -128,6 +129,8 @@ namespace sio
 
         void on_socket_opened(std::string const& nsp) override;
 
+        void set_is_tls_verification_enabled(bool is_enabled);
+
     private:
         void run_loop();
 
@@ -222,6 +225,8 @@ namespace sio
         unsigned m_reconn_attempts;
 
         unsigned m_reconn_made;
+
+        std::atomic_bool m_is_tls_verification_enabled;
 
         friend class sio::client;
         friend class sio::socket;

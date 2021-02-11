@@ -187,6 +187,11 @@ namespace sio
         }
     }
 
+    void client::set_is_tls_verification_enabled(bool is_enabled)
+    {
+        m_impl_tls->set_is_tls_verification_enabled(is_enabled);
+    }
+
     void client::set_reconnect_attempts(int attempts)
     {
         m_impl->set_reconnect_attempts(attempts);

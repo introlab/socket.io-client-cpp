@@ -37,7 +37,8 @@ namespace sio
         m_reconn_delay(5000),
         m_reconn_delay_max(25000),
         m_reconn_attempts(0xFFFFFFFF),
-        m_reconn_made(0)
+        m_reconn_made(0),
+        m_is_tls_verification_enabled(true)
     {
         using websocketpp::log::alevel;
 #ifndef DEBUG
@@ -188,6 +189,11 @@ namespace sio
     void client_tls_impl::on_socket_opened(string const& nsp)
     {
         if(m_socket_open_listener)m_socket_open_listener(nsp);
+    }
+
+    void client_tls_impl::set_is_tls_verification_enabled(bool is_enabled)
+    {
+        m_is_tls_verification_enabled.store(is_enabled);
     }
 
     /*************************private:*************************/
@@ -583,11 +589,20 @@ failed:
 
     client_tls_impl::context_ptr client_tls_impl::on_tls_init(connection_hdl conn)
     {
-        context_ptr ctx = context_ptr(new  asio::ssl::context(asio::ssl::context::tlsv1));
+        context_ptr ctx = context_ptr(new  asio::ssl::context(asio::ssl::context::tlsv12));
         asio::error_code ec;
         ctx->set_options(asio::ssl::context::default_workarounds |
                              asio::ssl::context::no_sslv2 |
                              asio::ssl::context::single_dh_use,ec);
+
+        if (m_is_tls_verification_enabled.load())
+        {
+            ctx->set_verify_mode(asio::ssl::verify_peer);
+        }
+        else
+        {
+            ctx->set_verify_mode(asio::ssl::verify_none);
+        }
         if(ec)
         {
             cerr<<"Init tls failed,reason:"<< ec.message()<<endl;
