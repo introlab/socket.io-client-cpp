@@ -68,6 +68,10 @@ namespace sio
 
         void set_reconnect_delay_max(unsigned millis);
 
+        void on(std::string const& event_name, sio::socket::event_listener const& func, const std::string& nsp = "");
+        void on(std::string const& event_name, sio::socket::event_listener_aux const& func,
+                const std::string& nsp = "");
+
         sio::socket::ptr const& socket(const std::string& nsp = "");
 
         // Closes the connection

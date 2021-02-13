@@ -126,6 +126,17 @@ namespace sio
         }
     }
 
+    void client::on(std::string const& event_name, socket::event_listener const& func, const std::string& nsp)
+    {
+        m_impl_tls->socket(nsp)->on(event_name, func);
+        m_impl->socket(nsp)->on(event_name, func);
+    }
+    void client::on(std::string const& event_name, socket::event_listener_aux const& func, const std::string& nsp)
+    {
+        m_impl_tls->socket(nsp)->on(event_name, func);
+        m_impl->socket(nsp)->on(event_name, func);
+    }
+
     socket::ptr const& client::socket(const std::string& nsp)
     {
         if (m_is_tls)
